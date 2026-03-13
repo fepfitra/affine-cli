@@ -11,6 +11,15 @@ cleanup() {
 }
 trap cleanup EXIT
 
+json_error() {
+    if [ -t 1 ]; then
+        echo "Error: $1"
+    else
+        echo "{\"error\":\"$1\",\"code\":\"$2\"}" >&2
+    fi
+    exit 1
+}
+
 echo '{"status":"checking","message":"Checking for latest version..."}'
 
 if command -v jq &> /dev/null; then
@@ -20,8 +29,7 @@ else
 fi
 
 if [ -z "$LATEST_TAG" ]; then
-    echo "Error: Could not fetch latest version. Check your network connection."
-    exit 1
+    json_error "Could not fetch latest version. Check your network connection." "FETCH_ERROR"
 fi
 
 echo "Latest version: $LATEST_TAG"
@@ -42,19 +50,18 @@ case "$OS" in
         case "$ARCH" in
             x86_64) ASSET_NAME="affine-linux-amd64" ;;
             aarch64) ASSET_NAME="affine-linux-arm64" ;;
-            *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+            *) json_error "Unsupported architecture: $ARCH" "UNSUPPORTED_ARCH" ;;
         esac
         ;;
     darwin*)
         case "$ARCH" in
             x86_64) ASSET_NAME="affine-darwin-amd64" ;;
             arm64) ASSET_NAME="affine-darwin-arm64" ;;
-            *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+            *) json_error "Unsupported architecture: $ARCH" "UNSUPPORTED_ARCH" ;;
         esac
         ;;
     *)
-        echo "Unsupported OS: $OS"
-        exit 1
+        json_error "Unsupported OS: $OS" "UNSUPPORTED_OS"
         ;;
 esac
 
@@ -71,9 +78,8 @@ mv "$TMPFILE" "$INSTALL_DIR/$BINARY_NAME"
 chmod +x "$INSTALL_DIR/$BINARY_NAME"
 
 if ! file "$INSTALL_DIR/$BINARY_NAME" | grep -qE "(ELF|Mach-O)"; then
-    echo "Error: Downloaded file is not a valid binary"
     rm -f "$INSTALL_DIR/$BINARY_NAME"
-    exit 1
+    json_error "Downloaded file is not a valid binary" "INVALID_BINARY"
 fi
 
 echo "{\"status\":\"success\",\"version\":\"$LATEST_TAG\",\"path\":\"$INSTALL_DIR/$BINARY_NAME\"}"
