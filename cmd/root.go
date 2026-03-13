@@ -24,6 +24,11 @@ var rootCmd = &cobra.Command{
 	Use:   "affine",
 	Short: "CLI for AFFiNE workspace management",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		if version, _ := cmd.Flags().GetBool("version"); version {
+			fmt.Printf("affine-cli %s\n", Version)
+			os.Exit(0)
+		}
+
 		// Allow schema/auth commands to skip config
 		if cmd.Name() == "schema" || cmd.Name() == "version" {
 			return nil
@@ -74,6 +79,7 @@ func init() {
 	rootCmd.PersistentFlags().Bool("dry-run", false, "Preview destructive operations without executing")
 	rootCmd.PersistentFlags().StringSlice("fields", nil, "Filter output fields (e.g., --fields id,title)")
 	rootCmd.PersistentFlags().Bool("json", false, "Read structured JSON input from stdin")
+	rootCmd.Flags().Bool("version", false, "Print version information")
 }
 
 func Execute() error {

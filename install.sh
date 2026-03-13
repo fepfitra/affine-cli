@@ -35,7 +35,7 @@ fi
 echo "Latest version: $LATEST_TAG"
 
 if [ -f "$INSTALL_DIR/$BINARY_NAME" ]; then
-    CURRENT_VERSION=$("$INSTALL_DIR/$BINARY_NAME" --version 2>/dev/null | awk '{print $2}')
+    CURRENT_VERSION=$("$INSTALL_DIR/$BINARY_NAME" version 2>/dev/null | awk '{print $2}')
     if [ "$CURRENT_VERSION" = "$LATEST_TAG" ]; then
         echo "Already at the latest version ($LATEST_TAG)"
         exit 0
