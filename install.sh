@@ -2,7 +2,7 @@
 
 set -e
 
-REPO="tomohiro/affine-cli"
+REPO="tomohiro-owada/affine-cli"
 BINARY_NAME="affine"
 INSTALL_DIR="$HOME/.local/bin"
 
