@@ -5,10 +5,9 @@ on:
     branches: [main]
   push:
     branches: [main]
-  workflow_dispatch:
-  tag:
-    patterns:
+    tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   test:
