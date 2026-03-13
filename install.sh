@@ -11,7 +11,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "Checking for latest version..."
+echo '{"status":"checking","message":"Checking for latest version..."}'
 
 if command -v jq &> /dev/null; then
     LATEST_TAG=$(curl -sL "https://api.github.com/repos/$REPO/releases/latest" | jq -r '.tag_name // empty')
@@ -76,6 +76,4 @@ if ! file "$INSTALL_DIR/$BINARY_NAME" | grep -qE "(ELF|Mach-O)"; then
     exit 1
 fi
 
-echo "Installed to $INSTALL_DIR/$BINARY_NAME"
-echo ""
-echo "Run: $BINARY_NAME --version"
+echo "{\"status\":\"success\",\"version\":\"$LATEST_TAG\",\"path\":\"$INSTALL_DIR/$BINARY_NAME\"}"
